@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -15,6 +15,7 @@ const AddNewProduct = () =>{
   const [selectedImage, setSelectedImage] = useState();
   const [open, setOpen] = useState(false);
   const productsCollection = collection(db, "products");
+  const [category, setCategory] = useState('fashoin');
   const storage = getStorage();
   
   const imageChange = (e) => {
@@ -22,6 +23,9 @@ const AddNewProduct = () =>{
       setSelectedImage(file);
 
   };
+  const handleCategory = (event) =>{
+    setCategory(event.target.value);
+  }
   const removeSelectedImage = () => {
     setSelectedImage();
   };
@@ -40,9 +44,10 @@ const AddNewProduct = () =>{
         img: snapshot,
         description: e.description,
         brand: e.brand,
-        rating: 0
+        rating: 0,
+        category
       }).then((res)=> setOpen(true)) 
-
+      console.log('add')
       resetForm(e)
     }
     const resetForm = (e) =>{
@@ -138,6 +143,8 @@ const AddNewProduct = () =>{
                 variant="filled"
                 type="text"
                 label="Description"
+                multiline
+                maxRows={4}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.description}
@@ -146,6 +153,22 @@ const AddNewProduct = () =>{
                 helperText={touched.description && errors.description}
                 sx={{ gridColumn: "span 4" }}
               />
+              <FormControl variant="filled" sx={{ gridColumn: "span 2" }}>
+                <InputLabel id="demo-simple-select-filled-label">Category</InputLabel>
+                <Select
+                  labelId="demo-simple-select-filled-label"
+                  id="demo-simple-select-filled"
+                  required
+                  value={category}
+                  onChange={handleCategory }
+                  name="category"
+                >
+                  <MenuItem value={'fashion'}>Fashion</MenuItem>
+                  <MenuItem value={'electronic'}>Electronic</MenuItem>
+                  <MenuItem value={"home"}>Home & Garden</MenuItem>
+                  <MenuItem value={"gifts"}>Gifts</MenuItem>
+                </Select>
+              </FormControl>
               <TextField
                 fullWidth
                 variant="filled"
@@ -156,7 +179,7 @@ const AddNewProduct = () =>{
                 name="img"
                 error={!!touched.img && !!errors.img}
                 helperText={touched.img && errors.img}
-                sx={{ gridColumn: "span 4" }}
+                sx={{ gridColumn: "span 2" }}
               />
               {selectedImage && (
                 <div>
@@ -171,7 +194,7 @@ const AddNewProduct = () =>{
                 </div>
               )}
             </Box>
-            <Box display="flex" justifyContent="end" mt="20px" mb='50px'>
+            <Box display="flex" justifyContent="start" mt="20px" mb='50px'>
               <Button type="submit" color="secondary" variant="contained">
                 Add
               </Button>
