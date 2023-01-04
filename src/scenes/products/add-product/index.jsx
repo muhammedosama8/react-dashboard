@@ -15,7 +15,7 @@ const AddNewProduct = () =>{
   const [selectedImage, setSelectedImage] = useState();
   const [open, setOpen] = useState(false);
   const productsCollection = collection(db, "products");
-  const [category, setCategory] = useState('fashoin');
+  const [category, setCategory] = useState('fashion');
   const storage = getStorage();
   
   const imageChange = (e) => {

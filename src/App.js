@@ -1,14 +1,14 @@
 import { createContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./scenes/dashboard";
-import AdminTeam from "./scenes/team";
+import AdminTeam from "./scenes/admin";
 import Invoices from "./scenes/invoices";
 import Contacts from "./scenes/contacts";
 import FAQ from "./scenes/faq";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
-import AddNewAdmin from "./scenes/team/add-admin";
+import AddNewAdmin from "./scenes/admin/add-admin";
 import Products from "./scenes/products";
 import Home from "./scenes/home";
 import Login from "./scenes/login";
@@ -17,6 +17,7 @@ import AddNewProduct from "./scenes/products/add-product";
 import NoMatch from "./scenes/noMatch";
 import Profile from "./scenes/profile";
 import UpdateProfile from "./scenes/profile/update";
+import EditAdmin from "./scenes/admin/edit-admin";
 
 export const AuthContext = createContext({})
 
@@ -56,8 +57,9 @@ function App() {
             <Routes>
               <Route exact path="/" element={<Home />} >
                 <Route index element={<Dashboard />} />
-                <Route path="team" element={<AdminTeam />} />
-                <Route path="team/add-new-admin" element={<AddNewAdmin />} />
+                <Route path="admin" element={<AdminTeam />} />
+                <Route path="admin/add-new-admin" element={<AddNewAdmin />} />
+                <Route path="admin/:id" element={<EditAdmin />} />
                 <Route path="contacts" element={<Contacts />}/>
                 <Route path="products" element={<Products />}/>
                 <Route path="products/add-new-product" element={<AddNewProduct />}/>

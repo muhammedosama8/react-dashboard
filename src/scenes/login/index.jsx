@@ -16,7 +16,9 @@ const Login = () => {
   const { currentUser } = useContext(AuthContext);
   const handleFormSubmit = (e) => {
     signInWithEmailAndPassword(auth, e.email, e.password)
-    .then((userCredential) => {})
+    .then((userCredential) => {
+      console.log(userCredential.user)
+    })
     .catch((error) => {
       const errorCode = error.code;
       setError(true)

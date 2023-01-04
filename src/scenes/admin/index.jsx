@@ -1,8 +1,10 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
+import CreateIcon from '@mui/icons-material/Create';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Header from "../../components/Header";
 import { useEffect, useState } from "react";
 import { getData } from "../../shared/data";
@@ -13,7 +15,10 @@ const AdminTeam = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const LinkToAdd = {
-    textDecoration: 'none'
+    textDecoration: 'none',
+    display: "inline-block"
+  }
+  const deleteUserAndProfile = (id) => {
   }
   const columns = [
     { field: "id", headerName: "ID" },
@@ -24,52 +29,70 @@ const AdminTeam = () => {
       cellClassName: "name-column--cell",
     },
     {
-      field: "age",
-      headerName: "Age",
-      type: "number",
-      headerAlign: "left",
-      align: "left",
-    },
-    {
-      field: "phone",
-      headerName: "Phone Number",
-      flex: 1,
-    },
-    {
       field: "email",
       headerName: "Email",
       flex: 1,
     },
     {
-      field: "accessLevel",
+      field: "contact",
+      headerName: "Phone Number",
+      flex: 1,
+    },
+    {
+      field: "address",
+      headerName: "Address",
+      type: "number",
+      headerAlign: "left",
+      align: "left",
+    },
+    {
+      field: "type",
       headerName: "Access Level",
       flex: 1,
-      renderCell: ({ row: { access } }) => {
+      renderCell: ({ row: { type } }) => {
         return (
           <Box
-            width="60%"
+            width="75%"
             m="0 auto"
             p="5px"
             display="flex"
             justifyContent="center"
             backgroundColor={
-              access === "admin"
+              type === "admin"
                 ? colors.greenAccent[600]
-                : access === "manager"
+                : type === "manager"
                 ? colors.greenAccent[700]
                 : colors.greenAccent[700]
             }
             borderRadius="4px"
           >
-            {access === "admin" && <AdminPanelSettingsOutlinedIcon />}
-            {access === "manager" && <SecurityOutlinedIcon />}
+            {type === "admin" && <AdminPanelSettingsOutlinedIcon />}
+            {type === "manager" && <SecurityOutlinedIcon />}
             <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
-              {access}
+              {type}
             </Typography>
           </Box>
         );
       },
     },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 1,
+      renderCell:({row: { id }}) => {
+        return(
+          <Box className="actions">
+            <Link className="toEdit" to={'/admin/'+id}>
+              <CreateIcon sx={{color: colors.grey[100]}}/>
+            </Link>
+
+            <Button sx={{minWidth: "auto", zIndex: "9999"}} onClick={()=> deleteUserAndProfile(id)}>
+              <DeleteIcon sx={{ color: "#c30000"}}/>
+            </Button>
+          </Box>
+        )
+      }
+    }
   ];
 
   useEffect(()=>{

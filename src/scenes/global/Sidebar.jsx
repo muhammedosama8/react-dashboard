@@ -45,7 +45,7 @@ const Sidebar = () => {
 
   useEffect(()=>{
     setUser(currentUser.displayName)
-  },[currentUser])
+  },[currentUser.displayName])
 
   return (
     <Box
@@ -136,7 +136,7 @@ const Sidebar = () => {
             />
             <Item
               title="Manage Team"
-              to="/team"
+              to="/admin"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

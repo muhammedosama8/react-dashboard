@@ -1,21 +1,56 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../../components/Header";
+import { useState } from "react";
+import AlertSnackbar from "../../../components/Alert";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db } from "../../../shared/firebase-config";
 
-const AddNewAdmin = () => {
+const EditAdmin = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  let { id } = useParams();
+  const [type, setType] = useState();
+  const [open, setOpen] = useState(false);
+  const [ initialValues, setInitialValues ] = useState({})
 
-  const handleFormSubmit = (values) => {
-    console.log(values);
-  };
+  const getAdminInfo = async (id) =>{
+    const adminInfo = await getDoc(doc(db, "team", id))
+    const data = adminInfo.data()
+    setInitialValues({
+      name: data.name,
+      contact: data.contact,
+      email: data.email,
+      address: data.address
+    })
+    setType(data.type)
+  }
+ 
+  useEffect(()=>{
+    getAdminInfo(id)
+  },[])
+
+  console.log(initialValues)
+
+  const handleFormSubmit = async (e) =>{
+    setOpen(false)
+    await updateDoc(doc(db, "team", id), {
+      ...e,
+      type: type
+    }).then(()=>{
+      console.log('Update')
+      setOpen(true)
+    })
+  }
 
   return (
     <Box m="20px">
-      <Header title="CREATE New Admin" subtitle="Create a New Admin" />
+      <Header title="Edit Admin" subtitle="Edit Admin Information" />
 
-      <Formik
+      {initialValues?.name && <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
         validationSchema={checkoutSchema}>
@@ -47,19 +82,6 @@ const AddNewAdmin = () => {
                 name="name"
                 error={!!touched.name && !!errors.name}
                 helperText={touched.name && errors.name}
-                sx={{ gridColumn: "span 4" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Email"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.email}
-                name="email"
-                error={!!touched.email && !!errors.email}
-                helperText={touched.email && errors.email}
                 sx={{ gridColumn: "span 3" }}
               />
               <TextField
@@ -75,41 +97,44 @@ const AddNewAdmin = () => {
                 helperText={touched.contact && errors.contact}
                 sx={{ gridColumn: "span 1" }}
               />
+              
+              <FormControl variant="filled" sx={{ gridColumn: "span 4" }}>
+                <InputLabel id="demo-simple-select-filled-label">Type</InputLabel>
+                <Select
+                  labelId="demo-simple-select-filled-label"
+                  id="demo-simple-select-filled"
+                  required
+                  value={type}
+                  onChange={(e) => setType(e.target.value) }
+                  name="type"
+                >
+                  <MenuItem value={'admin'}>Admin</MenuItem>
+                  <MenuItem value={'manager'}>Manager</MenuItem>
+                </Select>
+              </FormControl>
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Address 1"
+                label="Address"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.address1}
-                name="address1"
-                error={!!touched.address1 && !!errors.address1}
-                helperText={touched.address1 && errors.address1}
-                sx={{ gridColumn: "span 2" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Address 2"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.address2}
-                name="address2"
-                error={!!touched.address2 && !!errors.address2}
-                helperText={touched.address2 && errors.address2}
-                sx={{ gridColumn: "span 2" }}
+                value={values.address}
+                name="address"
+                error={!!touched.address && !!errors.address}
+                helperText={touched.address && errors.address}
+                sx={{ gridColumn: "span 4" }}
               />
             </Box>
-            <Box display="flex" justifyContent="end" mt="20px">
+            <Box display="flex" justifyContent="start" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
-                Create New User
+                Update
               </Button>
             </Box>
           </form>
         )}
-      </Formik>
+      </Formik> }
+      <AlertSnackbar type='success' openAlert={open} msg={'Success Update Admin'}/>
     </Box>
   );
 };
@@ -119,20 +144,11 @@ const phoneRegExp =
 
 const checkoutSchema = yup.object().shape({
   name: yup.string().required("required"),
-  email: yup.string().email("invalid email").required("required"),
   contact: yup
     .string()
     .matches(phoneRegExp, "Phone number is not valid")
     .required("required"),
-  address1: yup.string().required("required"),
-  address2: yup.string().required("required"),
+  address: yup.string().required("required")
 });
-const initialValues = {
-  name: "",
-  email: "",
-  contact: "",
-  address1: "",
-  address2: "",
-};
 
-export default AddNewAdmin;
+export default EditAdmin;

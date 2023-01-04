@@ -114,3 +114,11 @@ width: 100%;
     left: 50%;
     transform: translate(-50%, 0);
 }
+
+.toEdit{
+  padding: 6px 8px;
+}
+.actions{
+  align-items: flex-start;
+  display: flex;
+}
