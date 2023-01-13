@@ -31,8 +31,7 @@ const UpdateProfile = () => {
 
   useEffect(()=>{
     getProfileInfo(currentUser.uid)
-  },[])
-  console.log(currentUser)
+  },[currentUser.uid])
 
   const handleFormSubmit = async (values) => {
     setOpen(false)

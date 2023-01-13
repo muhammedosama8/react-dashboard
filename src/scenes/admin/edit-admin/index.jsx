@@ -31,9 +31,7 @@ const EditAdmin = () => {
  
   useEffect(()=>{
     getAdminInfo(id)
-  },[])
-
-  console.log(initialValues)
+  },[id])
 
   const handleFormSubmit = async (e) =>{
     setOpen(false)
