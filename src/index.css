@@ -122,3 +122,9 @@ width: 100%;
   align-items: flex-start;
   display: flex;
 }
+.css-112ysrj-MuiButtonBase-root-MuiCheckbox-root.Mui-checked{
+  color: #dedede!important;
+}
+.Mui-focused{
+  color: #dedede!important;
+}

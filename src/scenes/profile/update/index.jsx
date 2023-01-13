@@ -4,41 +4,59 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../../components/Header";
 import { getAuth, updateProfile } from "firebase/auth";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../../App";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db } from "../../../shared/firebase-config";
+import AlertSnackbar from "../../../components/Alert";
 
 const UpdateProfile = () => {
-  let initialValues = {
-    name: '',
-    email: ''
-  }
-  
-  const isNonMobile = useMediaQuery("(min-width:600px)");
+  const [ initialValues, setInitialValues ] = useState({})
+  const [open, setOpen] = useState(false);
+  const {currentUser} = useContext(AuthContext)
+
   const auth = getAuth();
-  const navigate = useNavigate();
+  const isNonMobile = useMediaQuery("(min-width:600px)");
  
+  const getProfileInfo = async (id) =>{
+    const adminInfo = await getDoc(doc(db, "team", id))
+    const data = adminInfo.data()
+    setInitialValues({
+      name: data.name,
+      contact: data.contact,
+      email: data.email,
+      address: data.address
+    })
+  }
 
   useEffect(()=>{
-    initialValues.name = auth.currentUser.displayName
-    initialValues.email = auth.currentUser.email
-  })
+    getProfileInfo(currentUser.uid)
+  },[])
+  console.log(currentUser)
 
-  const handleFormSubmit = (values) => {
-    updateProfile(auth.currentUser, {
-      displayName: values.name, 
-      email: values.email
+  const handleFormSubmit = async (values) => {
+    setOpen(false)
+    await updateDoc(doc(db, "team", currentUser.uid), {
+      ...values,
+    }).then(()=>{
+      setOpen(true)
+    })
+    await updateProfile(auth.currentUser, {
+      displayName: values.name,
+      email: values.email,
+      phoneNumber: values.contact
     }).then(() => {
-      navigate('/profile')
+      console.log(currentUser)
     }).catch((error) => {
+      console.log(error.message)
     });
-    
   };
 
   return (
     <Box m="20px">
-      <Header title="Update Admin" subtitle="Update Admin" />
+      <Header title="Update Profile" subtitle="Update Profile" />
 
-      <Formik
+      {initialValues?.name && <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
         validationSchema={checkoutSchema}
@@ -93,6 +111,7 @@ const UpdateProfile = () => {
                 label="Contact Number"
                 onBlur={handleBlur}
                 onChange={handleChange}
+                value={values.contact}
                 name="contact"
                 error={!!touched.contact && !!errors.contact}
                 helperText={touched.contact && errors.contact}
@@ -106,6 +125,7 @@ const UpdateProfile = () => {
                 onBlur={handleBlur}
                 onChange={handleChange}
                 name="address"
+                value={values.address}
                 error={!!touched.address && !!errors.address}
                 helperText={touched.address && errors.address}
                 sx={{ gridColumn: "span 4" }}
@@ -118,7 +138,8 @@ const UpdateProfile = () => {
             </Box>
           </form>
         )}
-      </Formik>
+      </Formik>}
+      <AlertSnackbar type='success' openAlert={open} msg={'Success Update Profile'}/>
     </Box>
   );
 };

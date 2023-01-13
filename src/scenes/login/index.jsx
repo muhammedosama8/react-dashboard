@@ -63,7 +63,7 @@ const Login = () => {
                 
                 variant="filled"
                 type="text"
-                label="Email ex: test@gmail.com"
+                label="Email ex: muhammed@gmail.com"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.email}

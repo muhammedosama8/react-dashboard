@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Box, Button, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -12,6 +12,8 @@ import AlertSnackbar from "../../../components/Alert";
 
 const AddNewProduct = () =>{
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const sizesLabels = ['xs', 's', 'm', 'l', 'xl', 'xxl', 'xxxl']
+  const [sizes, setSizes] = useState([])
   const [selectedImage, setSelectedImage] = useState();
   const [open, setOpen] = useState(false);
   const productsCollection = collection(db, "products");
@@ -27,10 +29,11 @@ const AddNewProduct = () =>{
     setCategory(event.target.value);
   }
   const removeSelectedImage = () => {
+    setSizes([])
     setSelectedImage();
   };
 
-    const handleFormSubmit = async (e) =>{
+  const handleFormSubmit = async (e) =>{
       setOpen(false)
       let id = uuidv4()
       const storageRef = ref(storage, selectedImage.name);
@@ -43,50 +46,54 @@ const AddNewProduct = () =>{
         quantity: e.quantity,
         img: snapshot,
         description: e.description,
+        sizes: sizes,
         brand: e.brand,
         rating: 0,
         category
       }).then((res)=> setOpen(true)) 
       console.log('add')
       resetForm(e)
-    }
-    const resetForm = (e) =>{
-      e.name =''
-      e.price = ''
-      e.quantity= ""
-      e.description= ""
-      e.brand= ""
-      e.img= ""
-      removeSelectedImage()
-    }
-    return(
-        <Box m="20px">
-        <Header title="CREATE PRODUCT" subtitle="Create a New Product" />
+  }
+  const resetForm = (e) =>{
+    e.name =''
+    e.price = ''
+    e.quantity= ""
+    e.description= ""
+    e.brand= ""
+    e.img= ""
+    removeSelectedImage()
+  }
+  const handleSizes = (e) =>{
+    setSizes([...sizes,e.target.value])
+  }
+  return(
+    <Box m="20px">
+      <Header title="CREATE PRODUCT" subtitle="Create a New Product" />
         
-        <Formik
+      <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
         validationSchema={checkoutSchema}
       >
-        {({
-          values,
-          errors,
-          touched,
-          handleBlur,
-          handleChange,
-          handleSubmit,
-        }) => (
-          <form onSubmit={handleSubmit}>
-            <Box
-              display="grid"
-              gap="30px"
-              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-              sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-              }}
-            >
-              <TextField
-                fullWidth
+      {({
+        values,
+        errors,
+        touched,
+        handleBlur,
+        handleChange,
+        handleSubmit,
+      }) => (
+        <form onSubmit={handleSubmit}>
+          <Box
+            display="grid"
+            gap="30px"
+            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+            sx={{
+              "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+            }}
+          >
+            <TextField
+              fullWidth
                 variant="filled"
                 type="text"
                 label="Product Name"
@@ -137,7 +144,22 @@ const AddNewProduct = () =>{
                 helperText={touched.brand && errors.brand}
                 sx={{ gridColumn: "span 2" }}
               />
-
+              <FormControl sx={{ gridColumn: "span 4" }}>
+                <FormLabel>Sizes</FormLabel>
+                <FormGroup aria-label="position" sx={{ gap: "25px" }} row>
+                  {sizesLabels?.map((size) => (
+                    <FormControlLabel
+                    key={size}
+                    value={size}
+                    control={<Checkbox />}
+                    sx={{ textTransform: 'uppercase'}}
+                    label={size}
+                    labelPlacement="end"
+                    onChange={handleSizes}
+                  />
+                  ))}
+                </FormGroup>
+              </FormControl>
               <TextField
                 fullWidth
                 variant="filled"
